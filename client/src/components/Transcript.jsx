@@ -51,15 +51,13 @@ const Transcript = ({ transcriptSegments, onNewSegment }) => {
   };
 
   const processAudio = async (blob) => {
-    if (!apiKey) return;
-    
     const formData = new FormData();
     formData.append('audio', blob, 'chunk.webm');
 
     try {
       const response = await axios.post('/api/transcribe', formData, {
         headers: {
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': apiKey ? `Bearer ${apiKey}` : '',
           'Content-Type': 'multipart/form-data'
         }
       });

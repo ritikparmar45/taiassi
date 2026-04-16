@@ -1,5 +1,5 @@
 import React from 'react';
-import { X, Save, Key, MessageSquare, Clock } from 'lucide-react';
+import { X, Save, Key, MessageSquare, Clock, Bot } from 'lucide-react';
 import { useSettings } from '../context/SettingsContext';
 
 const Settings = ({ onClose }) => {

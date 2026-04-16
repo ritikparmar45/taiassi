@@ -21,15 +21,16 @@ const Chat = ({ fullTranscript, history, onUpdateHistory }) => {
     };
     window.addEventListener('suggestion-click', handleSuggestionClick);
     return () => window.removeEventListener('suggestion-click', handleSuggestionClick);
-  }, [fullTranscript, history, apiKey]);
+  }, [fullTranscript, apiKey]); // Removed 'history' from dependencies to prevent listener churn
 
   const handleSend = async (messageText) => {
     const text = messageText || input;
-    if (!text.trim() || !apiKey || loading) return;
+    if (!text.trim() || loading) return;
 
     const newMessage = { role: 'user', content: text };
-    const updatedHistory = [...history, newMessage];
-    onUpdateHistory(updatedHistory);
+    
+    // Use functional update to ensure we have the latest history
+    onUpdateHistory(prev => [...prev, newMessage]);
     setInput('');
     setLoading(true);
 
@@ -38,23 +39,25 @@ const Chat = ({ fullTranscript, history, onUpdateHistory }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`
+          'Authorization': apiKey ? `Bearer ${apiKey}` : ''
         },
         body: JSON.stringify({
           message: text,
           transcript: fullTranscript,
-          history: history,
+          history: history, // Note: We use the snapshot of history at the time of click
           customPrompt: chatPrompt,
           stream: true
         })
       });
 
-      const assistantMessage = { role: 'assistant', content: '' };
-      onUpdateHistory([...updatedHistory, assistantMessage]);
+      if (!response.ok) throw new Error('Failed to fetch response');
 
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let assistantContent = '';
+
+      // Initialize assistant message
+      onUpdateHistory(prev => [...prev, { role: 'assistant', content: '' }]);
 
       while (true) {
         const { done, value } = await reader.read();
@@ -65,12 +68,22 @@ const Chat = ({ fullTranscript, history, onUpdateHistory }) => {
         
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const dataStr = line.replace('data: ', '');
+            const dataStr = line.replace('data: ', '').trim();
             if (dataStr === '[DONE]') break;
             try {
               const data = JSON.parse(dataStr);
-              assistantContent += data.content;
-              onUpdateHistory([...updatedHistory, { role: 'assistant', content: assistantContent }]);
+              if (data.content) {
+                assistantContent += data.content;
+                // Update ONLY the last message (the assistant's)
+                onUpdateHistory(prev => {
+                  const newHistory = [...prev];
+                  newHistory[newHistory.length - 1] = { 
+                    role: 'assistant', 
+                    content: assistantContent 
+                  };
+                  return newHistory;
+                });
+              }
             } catch (e) {}
           }
         }

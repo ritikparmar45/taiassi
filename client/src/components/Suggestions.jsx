@@ -11,7 +11,7 @@ const Suggestions = ({ fullTranscript, suggestionBatches, onNewBatch }) => {
   const timerRef = useRef(null);
 
   const fetchSuggestions = async () => {
-    if (!apiKey || !fullTranscript || loading) return;
+    if (!fullTranscript || loading) return;
     
     setLoading(true);
     try {

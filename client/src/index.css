@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 @theme {
-  --color-background: #0a0a0c;
-  --color-panel: #16161a;
+  --color-background: #131418;
+  --color-panel: #1e1f26;
   --color-primary: #3b82f6;
   --color-secondary: #10b981;
   --color-accent: #8b5cf6;
@@ -14,11 +14,10 @@
   --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
 }
 
-@layer base {
-  body {
-    @apply bg-background text-text-main antialiased overflow-hidden;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  }
+/* Base styles without @layer to ensure compatibility with Tailwind v4 PostCSS */
+body {
+  @apply bg-background text-text-main antialiased overflow-hidden;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .glass {
