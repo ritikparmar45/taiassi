@@ -18,7 +18,7 @@ const Suggestions = ({ fullTranscript, suggestionBatches, onNewBatch }) => {
       // Use only recent transcript part for efficiency
       const recentTranscript = fullTranscript.slice(-2000); 
       
-      const response = await axios.post('http://localhost:5000/api/suggest', {
+      const response = await axios.post('/api/suggest', {
         transcript: recentTranscript,
         customPrompt: suggestionPrompt
       }, {

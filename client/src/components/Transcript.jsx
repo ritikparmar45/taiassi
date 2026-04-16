@@ -57,7 +57,7 @@ const Transcript = ({ transcriptSegments, onNewSegment }) => {
     formData.append('audio', blob, 'chunk.webm');
 
     try {
-      const response = await axios.post('http://localhost:5000/api/transcribe', formData, {
+      const response = await axios.post('/api/transcribe', formData, {
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'multipart/form-data'
