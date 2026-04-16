@@ -1,10 +1,22 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-background: #0a0a0c;
+  --color-panel: #16161a;
+  --color-primary: #3b82f6;
+  --color-secondary: #10b981;
+  --color-accent: #8b5cf6;
+  --color-text-main: #e2e8f0;
+  --color-text-dim: #94a3b8;
+  
+  --background-image-glass-gradient: linear-gradient(135deg, rgba(255, 255, 255, 0.05) 0%, rgba(255, 255, 255, 0.01) 100%);
+  
+  --animate-pulse-slow: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
 
 @layer base {
   body {
-    @apply bg-background text-textMain antialiased overflow-hidden;
+    @apply bg-background text-text-main antialiased overflow-hidden;
     font-family: 'Inter', system-ui, -apple-system, sans-serif;
   }
 }
