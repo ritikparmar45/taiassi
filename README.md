@@ -9,32 +9,40 @@ In high-stakes meetings, it's easy to lose track of context or miss opportunitie
 
 ---
 
+## 📂 Project Structure
+```text
+TaiAssi/
+├── client/             # React (Vite) Frontend
+│   ├── src/            # Components, Hooks, Context
+│   └── vite.config.js  # Proxy config for local development
+├── server/             # Node.js (Express) Backend
+│   ├── routes/         # API endpoints (Transcribe, Suggest, Chat)
+│   └── index.js        # Main entry point
+├── vercel.json         # Deployment configuration for Vercel
+└── README.md           # This comprehensive guide
+```
+
+---
+
 ## 🏗️ Tech Stack
-- **Frontend**: React (Vite) + Tailwind CSS + Framer Motion (for smooth, premium animations).
-- **Backend**: Node.js + Express (Serverless ready for Vercel).
-- **AI APIs**: 
-  - **Groq Whisper Large V3**: Industry-leading speed for Speech-to-Text.
-  - **Groq Llama 3.3 70B**: High-reasoning model for context-aware suggestions and detailed chat.
-- **State Management**: React Context API + LocalStorage for persistent configuration.
+- **Frontend**: React (Vite) + Tailwind CSS + Framer Motion.
+- **Backend**: Node.js + Express.
+- **AI Engine**: 
+  - **Groq Whisper Large V3**: For ultra-fast Speech-to-Text.
+  - **Groq Llama 3.3 70B**: For context-aware suggestions and chat reasoning.
+- **Deployment**: Vercel (Optimized for Serverless).
 
 ---
 
-## 🧠 Prompt Engineering Strategy (Core Logic)
-
-The "Brain" of TwinMind relies on three distinct prompt layers designed for maximum utility and minimal noise.
-
-### 1. The "Diversity-First" Suggestion Prompt
-To avoid repetitive or vague outputs, the suggestion prompt uses a strict **Type-Enforcement Logic**:
-- **Objective**: Generate exactly 3 suggestions.
-- **Diversity Constraint**: Each batch must contain 1 **Probing Question** (to uncover depth), 1 **Strategic Insight/Talking Point** (to add value), and 1 **Action Item/Answer** (to drive progress).
-- **Context Windowing**: We use a **Sliding Context Window** of the last ~2,000 characters of the transcript. This ensures the AI isn't bogged down by the start of the meeting and focuses on the *current* conversation flow.
-
-### 2. Context-Aware Deep Dives
-When a suggestion is clicked, the **Chat Prompt** shifts from "Summarizer" to "Subject Matter Expert." It pulls the **Full Session Transcript** to ensure the detailed answer is technically accurate and grounded in everything discussed so far.
+## 🧠 Prompt Engineering Strategy
+The "Brain" uses a three-layer prompt strategy:
+1. **Diversity-First Suggestions**: Generates 1 Probing Question, 1 Strategic Insight, and 1 Action Item every 30s.
+2. **Sliding Context Window**: Uses only the last 2,000 characters for suggestions to maintain speed and focus.
+3. **Session Memory Chat**: A dedicated agent that has access to the *entire* transcript for technical deep dives.
 
 ---
 
-## 📐 Architecture & Flow
+## 📐 System Architecture
 ```mermaid
 graph LR
     A[Microphone] -->|30s Chunks| B(Backend Proxy)
@@ -45,50 +53,54 @@ graph LR
     F -->|User Click| G[Detailed Answer Chat]
 ```
 
-1.  **Frontend**: Captures audio via `MediaRecorder` API, chunked every 30s to balance latency and context completeness.
-2.  **Backend**: Processes chunks in memory (Vercel-compatible) and proxies to Groq. 
-3.  **Real-Time Loop**: Auto-triggers new suggestions batches every 30s, fading older batches into the background to keep the UI clean.
-
 ---
 
-## ⚖️ Tradeoffs & Optimizations
+## ⚙️ Local Setup & Installation
 
-### 🚀 Latency vs. Accuracy
-- **Decision**: We chose **Whisper Large V3** via Groq's LPUs.
-- **Tradeoff**: While a local model would be more private, the **sub-second transcription latency** provided by Groq is critical for a "Live" experience where 2-3 seconds of delay can make a suggestion irrelevant.
+### 1. Prerequisites
+- Node.js installed.
+- A **Groq API Key** (Get it from [console.groq.com](https://console.groq.com)).
 
-### 📏 Context Window size
-- **Decision**: The suggestion batching uses a **Rolling Window** instead of the full transcript.
-- **Tradeoff**: This loses some "long-term memory" in suggestions but ensures **extremely fast response times** and keeps the AI focused on the *immediate* moment, which is where "Live Suggestions" are most valuable.
-
-### ☁️ Serverless Deployment
-- **Decision**: Deployment optimized for **Vercel Serverless**.
-- **Tradeoff**: Required switching from `DiskStorage` to `MemoryStorage` for audio. While this limits file size to 4.5MB, it's perfect for 30s audio chunks and enables **zero-cost scaling**.
-
----
-
-## ⚙️ Setup & Installation
-
-### Backend
+### 2. Backend Configuration
 ```bash
 cd server
 npm install
+```
+Create a `.env` file in the `server` folder:
+```env
+GROQ_API_KEY=your_key_here
+PORT=5000
+```
+Run the server:
+```bash
 npm start
 ```
 
-### Frontend
+### 3. Frontend Configuration
 ```bash
 cd client
 npm install
 npm run dev
 ```
+The frontend is configured to proxy `/api` requests to `http://localhost:5000`.
 
-> [!IMPORTANT]
-> Ensure you set your `GROQ_API_KEY` in the `server/.env` file or directly in the App Settings panel.
+---
+
+## 🚀 Deployment (Vercel)
+This project is pre-configured for Vercel. 
+1. Push your code to GitHub.
+2. Import the project into Vercel.
+3. Add `GROQ_API_KEY` to Vercel's **Environment Variables**.
+4. Deploy!
 
 ---
 
 ## 🎨 UI Aesthetics
-- **Dark Mode**: High-contrast, easy-on-the-eyes during long meetings.
-- **Glassmorphism**: Premium frosted-glass effect for panels.
-- **Micro-interactions**: Pulse animations for recording states and layout transitions.
+- **Dark Mode**: Premium high-contrast layout.
+- **Glassmorphism**: Elegant frosted-glass panels.
+- **Micro-animations**: Smooth transitions using Framer Motion.
+
+---
+
+> [!IMPORTANT]
+> The application requires microphone permissions. Ensure you allow access when prompted in the browser.
